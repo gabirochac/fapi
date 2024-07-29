@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, TouchableWithoutFeedback, Keyboard, useColorScheme } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export function Form() {    
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
+    const [aage, setAage] = useState('');
     const [testDate, setTestDate] = useState('');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const colorScheme = useColorScheme();  // Detecta o tema atual (claro ou escuro)
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
+
+    const handleConfirm = (date) => {
+        setTestDate(date.toLocaleDateString());
+        hideDatePicker();
+    };
 
     const handleSubmit = () => {
-        if (!name || !age || !testDate) {
+        if (!aage || !email || !name || !age || !testDate) {
             Alert.alert('Erro', 'Por favor, preencha todos os campos.');
             return;
         }
@@ -21,48 +39,71 @@ export function Form() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Nome do Paciente:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o nome"
-                value={name}
-                onChangeText={setName}
-            />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Text style={styles.label}>Email:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Digite um email válido"
+                    value={email}
+                    onChangeText={setEmail}
+                />
+                
+                <Text style={styles.h2}>IDENTIFICAÇÃO DA CRIANÇA</Text>
 
-            <Text style={styles.label}>Idade:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite a idade"
-                value={age}
-                onChangeText={setAge}
-                keyboardType="numeric"
-            />
+                <Text style={styles.label}>Iniciais do Nome</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Digite o nome"
+                    value={name}
+                    onChangeText={setName}
+                />
 
-            <Text style={styles.label}>Data do Teste:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite a data do teste"
-                value={testDate}
-                onChangeText={setTestDate}
-            />
+                <Text style={styles.label}>Data de nascimento</Text>
+                <TouchableOpacity onPress={showDatePicker} style={styles.input}>
+                    <Text style={styles.placeholder}>{testDate || "Selecione a data de nascimento"}</Text>
+                </TouchableOpacity>
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                    themeVariant={colorScheme}  // Define o tema (claro ou escuro) do seletor de data
+                />
 
-            <TouchableOpacity 
-                style={styles.button} 
-                onPress={handleSubmit}
-            >
-                <Icon name="check" size={20} color="#FFF" style={styles.icon} />
-                <Text style={styles.buttonText}>Enviar</Text>
-            </TouchableOpacity>
+                <Text style={styles.label}>Idade:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Digite a idade (anos e meses)"
+                    value={age}
+                    onChangeText={setAge}
+                />
 
-            <TouchableOpacity 
-                style={styles.backButton} 
-                onPress={() => navigation.navigate("Home")}
-            >
-                <Icon name="arrow-left" size={20} color="#FFF" style={styles.icon} />
-                <Text style={styles.buttonText}>Voltar para a página principal</Text>
-            </TouchableOpacity>
-        </View>
+                <Text style={styles.label}>Idade auditiva</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Digite a idade auditiva (anos e meses)"
+                    value={aage}
+                    onChangeText={setAage}
+                />
+
+                <TouchableOpacity 
+                    style={styles.button} 
+                    onPress={handleSubmit}
+                >
+                    <Icon name="check" size={20} color="#FFF" style={styles.icon} />
+                    <Text style={styles.buttonText}>Enviar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    style={styles.backButton} 
+                    onPress={() => navigation.navigate("Home")}
+                >
+                    <Icon name="arrow-left" size={20} color="#FFF" style={styles.icon} />
+                    <Text style={styles.buttonText}>Voltar para a página principal</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 }
 
@@ -75,6 +116,19 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         marginBottom: 5,
+    },
+    h2: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 30,
+        marginTop: 30,
+        color: "#29235C",
+        textDecorationLine: 'underline',
+    },
+    h3: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
     },
     input: {
         borderWidth: 1,
@@ -107,5 +161,8 @@ const styles = StyleSheet.create({
     },
     icon: {
         marginRight: 10,  // Espaço entre o ícone e o texto
-    }
+    },
+    placeholder: {
+        color: '#C3C3C3',
+    },
 });
